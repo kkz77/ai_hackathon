@@ -17,7 +17,6 @@ accident_analysis_dir = os.path.join(current_dir, 'accident_analysis')
 yolo_dir = os.path.join(current_dir,'fifth_yolo_python-1')
 sys.path.append(accident_analysis_dir)
 sys.path.append(yolo_dir)
-
 # Load environment variables
 load_dotenv(find_dotenv())
 
@@ -25,7 +24,7 @@ load_dotenv(find_dotenv())
 import data_load_gemini as dl
 ##For aws service
 #import data_load_aws as dl
-import new_yolo as yolo
+import main_yolo as yolo
 
 # Transcribe audio file to text
 def transcribe_audio(audio_file):
@@ -140,7 +139,7 @@ def handle_input(input_type, file, text):
     return result, gr.update(), ""  # Don't clear file input, only clear text input
 
 # Define the Gradio interface
-with gr.Blocks() as demo:
+with gr.Blocks(css="styles.css") as demo:
     with gr.Tabs():
         with gr.TabItem("SpeechSync", id="tab-soundsync"):
             gr.Markdown("### SpeechSync")
@@ -149,8 +148,8 @@ with gr.Blocks() as demo:
             
             generate_button = gr.Button("Generate Text")
             
-            transcribe_output = gr.Textbox(label="Your Prompt", lines=3)
-            text_output = gr.Textbox(label="AI Generated Text", lines=10)
+            transcribe_output = gr.Textbox(label="Your Prompt", lines=3,elem_classes='textbox')
+            text_output = gr.Textbox(label="AI Generated Text", lines=10, elem_classes='textbox')
             
             generate_button.click(
                 fn=process_video_and_generate_text,
@@ -162,9 +161,9 @@ with gr.Blocks() as demo:
             gr.Markdown("### Safety Bot")
             with gr.Row():
                 with gr.Column(scale=1):
-                    chatbot = gr.Chatbot(layout="bubble", bubble_full_width=False, height=600)
+                    chatbot = gr.Chatbot(layout="bubble", bubble_full_width=False, height=600, elem_classes="textbox")
                 with gr.Column(scale=1):
-                    text_input = gr.Textbox(label="Type your message here:", lines=3)
+                    text_input = gr.Textbox(label="Type your message here:", lines=3, elem_classes="textbox")
                     with gr.Row():
                         audio_input = gr.Audio(type="filepath", label="Record Audio")
                         image_input = gr.Image(type="filepath", label="Upload Image")
@@ -201,10 +200,10 @@ with gr.Blocks() as demo:
                 with gr.Column(scale=1, visible=True) as pdf_col:
                     file_input = gr.File(label="Upload PDF", file_types=[".pdf"])
                 with gr.Column(scale=2, visible=False) as text_col:
-                    text_input = gr.Textbox(label="Enter your accident case", lines=5)
+                    text_input = gr.Textbox(label="Enter your accident case", lines=5, elem_classes="textbox")
             
             analyze_button = gr.Button("Analyze")
-            output = gr.Textbox(label="Analysis Result", lines=10)
+            output = gr.Textbox(label="Analysis Result", lines=10 ,elem_classes="textbox")
             
             # Toggle visibility based on input type selection
             def toggle_input_type(choice):
