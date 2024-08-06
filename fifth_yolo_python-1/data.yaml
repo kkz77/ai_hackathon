@@ -1,0 +1,13 @@
+train: C:\Users\USER\Desktop\OpenCv\fifth_yolo_python\train\images
+val: C:\Users\USER\Desktop\OpenCv\fifth_yolo_python\valid\images
+test: C:\Users\USER\Desktop\OpenCv\fifth_yolo_python\test\images
+
+nc: 3
+names: ["fraiseuse", "perceuse", "tour parallele"]
+
+roboflow:
+  workspace: osi
+  project: machibes
+  version: 1
+  license: CC BY 4.0
+  url: https://universe.roboflow.com/osi/machibes/dataset/1

@@ -1,0 +1,19 @@
+# Ignore all .env files
+*.env
+# But don't ignore example.env
+!example.env
+
+# Ignore .env files in any directory
+**/.env
+
+# Ignore specific environment files
+.env.local
+.env.development
+.env.test
+.env.production
+
+# Ignore specific file paths
+fifth_yolo_python-1/train/
+fifth_yolo_python-1/__pycache__/
+espnet_env/
+__pycache__/
