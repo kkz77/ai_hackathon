@@ -1,5 +1,4 @@
 import os
-import re
 from langchain_google_genai import GoogleGenerativeAI
 from langchain_core.prompts import PromptTemplate 
 from langchain.chains import ConversationChain
@@ -13,7 +12,11 @@ google_api_key = os.getenv("GOOGLE_API_KEY")
 os.environ['GRPC_VERBOSITY'] = 'ERROR'
 os.environ['GRPC_TRACE'] = ''
 
-# Initialize the LLM with the Google API key
+#Define current directory
+current_dir = os.path.dirname(os.path.abspath(__file__))
+
+
+# Initialize the LLM and Gemini_embeddings with the Google API key
 llm = GoogleGenerativeAI(model="models/gemini-pro", google_api_key=google_api_key)
 
 # Define the prompt template
@@ -51,15 +54,8 @@ memory = ConversationBufferMemory()
 conversation = ConversationChain(
     llm=llm,
     memory=memory,
-    prompt=prompt
+    prompt=prompt,
 )
-
-def extract_risk_level(text):
-    # Regular expression to capture the number part of the percentage
-    match = re.search(r'\*\*Potential Risk Level:\*\*\s*(\d+)%', text)
-    if match:
-        return int(match.group(1))
-    return None
 
 def chatbot(human_input, image = None):
     if image:
@@ -68,6 +64,7 @@ def chatbot(human_input, image = None):
             encoded_image = base64.b64encode(image_file.read()).decode('utf-8')
         # Prepare a prompt that includes the image
         prompt = f"Here's an image for analysis: [IMAGE]{image}[/IMAGE]\n\nHuman input: {human_input}"
+        
     else:
         prompt = human_input
     # Generate a response from the LLM

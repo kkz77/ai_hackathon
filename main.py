@@ -14,7 +14,7 @@ import sys
 # Set up directories and paths
 current_dir = os.path.dirname(os.path.abspath(__file__))
 accident_analysis_dir = os.path.join(current_dir, 'accident_analysis')
-yolo_dir = os.path.join(current_dir,'fifth_yolo_python-1')
+yolo_dir = os.path.join(current_dir,'detect_machine_using_yolo')
 sys.path.append(accident_analysis_dir)
 sys.path.append(yolo_dir)
 # Load environment variables
@@ -86,6 +86,8 @@ def handle_input_modified(input_text, chat_history, image):
     if image_path:
         #For AWS chatbot claude model
         #response = ac.chatbot(input_text, image=image_path)
+        #For usage with RAG
+        #response = dl.chatbot(input_text,image=image_path)
         response = gc.chatbot(input_text, image=image_path)
     else:
         #response = ac.chatbot(input_text)
@@ -161,9 +163,9 @@ with gr.Blocks(css="styles.css") as demo:
             gr.Markdown("### Safety Bot")
             with gr.Row():
                 with gr.Column(scale=1):
-                    chatbot = gr.Chatbot(layout="bubble", bubble_full_width=False, height=600, elem_classes="textbox")
+                    chatbot = gr.Chatbot(layout="bubble", bubble_full_width=False, height=600, )
                 with gr.Column(scale=1):
-                    text_input = gr.Textbox(label="Type your message here:", lines=3, elem_classes="textbox")
+                    text_input = gr.Textbox(label="Type your message here:", lines=3)
                     with gr.Row():
                         audio_input = gr.Audio(type="filepath", label="Record Audio")
                         image_input = gr.Image(type="filepath", label="Upload Image")

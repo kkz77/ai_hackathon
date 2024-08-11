@@ -7,6 +7,9 @@ from langchain.prompts import PromptTemplate
 from langchain.chains import RetrievalQA
 from langchain_google_genai import GoogleGenerativeAI, GoogleGenerativeAIEmbeddings
 from langchain.text_splitter import RecursiveCharacterTextSplitter
+from langchain.chains import ConversationChain
+from langchain.memory import ConversationBufferMemory
+import base64
 import numpy as np
 import os
 import pickle
@@ -82,13 +85,6 @@ print("Accident file:", accident_file)
 loader = PyPDFDirectoryLoader(accident_file)
 accident_cases = loader.load()
 
-# Function to extract text from the loaded documents
-def extract_text_from_documents(documents):
-    all_text = ""
-    for document in documents:
-        all_text += document.page_content + " "
-    return all_text
-
 # Define prompt templates for accident analysis and safety recommendations
 prompt_template = """
 Human: You are an industrial safety expert. You will do an accident case analysis of the accident case provided by the user as "Question". Use the following pieces of context to get additional knowledge. Based on the knowledge from the context and your pretrained general knowledge, you have to answer three questions about the accident:
@@ -124,6 +120,44 @@ Question: {question}
 Assistant:
 """
 
+conversation_template ="""
+H: You are industrial safety expert. Imagine you are having a conversation with industrial worker. Provide appropriate health and safety recommendation
+related to industrial fields based on your knowledge. When the user asks for health and safety recommendations,
+you need to think step by step and analyze the case and generate precise content.
+The AI provides specific details when necessary, but keeps responses concise when possible.
+Don't say "Based on the context" or "Based on your knowledge". Don't let the answer be too long. 
+If you need any answer for details analysis, ask the user back what you need.
+The AI can analyze images when they are provided and detect machines.
+Make sure you use simple language so that user can understand.
+Current conversation:
+<conversation_history>
+{history}
+</conversation_history>
+
+Here is the human's next input, which may include an image:
+<human_input>
+{input}
+</human_input>
+
+Please provide a concise response unless a longer explanation is necessary. If an image is present, analyze it in the context of the human's input.
+
+A:
+"""
+
+
+# Create the prompt
+conversation_prompt = PromptTemplate(template=conversation_template, input_variables=["history", "input"])
+
+# Initialize memory for the conversation
+memory = ConversationBufferMemory()
+
+# Initialize the conversation chain
+conversation = ConversationChain(
+    llm=llm,
+    memory=memory,
+    prompt=conversation_prompt,
+)
+
 # Initialize prompt templates
 PROMPT = PromptTemplate(template=prompt_template, input_variables=["context", "question"])
 PROMPT2 = PromptTemplate(template=prompt_template2, input_variables=["context", "question"])
@@ -145,6 +179,10 @@ qa2 = RetrievalQA.from_chain_type(
     chain_type_kwargs={"prompt": PROMPT2}
 )
 
+# Function to get context from RAG
+def get_retrieved_context(user_input):
+    return qa({"query": user_input})['result']
+
 # Function to get accident analysis based on user input
 def rgl(user_input):
     query = user_input 
@@ -158,6 +196,24 @@ def rgl2(user_input, machine=None):
     query_embedding = vectorstore_faiss.embedding_function.embed_query(query)
     print(np.array(query_embedding))
     return qa2({"query": query})['result']
+
+# Function to handle chatbot responses with RAG
+def chatbot(human_input, image=None):
+    context = get_retrieved_context(human_input)
+    
+    if image:
+        # Encode the image to base64
+        with open(image, "rb") as image_file:
+            encoded_image = base64.b64encode(image_file.read()).decode('utf-8')
+        # Prepare a prompt that includes the image
+        prompt = f"Here's an image for analysis: [IMAGE]{encoded_image}[/IMAGE]\n\nHuman input: {human_input}\n\nContext: {context}"
+    else:
+        prompt = f"Human input: {human_input}\n\nContext: {context}"
+
+    # Generate a response from the LLM
+    response = conversation.predict(input=prompt)
+    return response
+
 
 # Example usage
 #print(rgl("What can happen if I use a drilling machine"))
