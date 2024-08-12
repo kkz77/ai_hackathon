@@ -38,7 +38,7 @@ This AI-powered safety assistant serves as a valuable tool for enhancing workpla
     ```bash
     pip install -r requirements.txt
     ```
-6. ## Environment Setup
+6. Environment Setup
     
     To run this project, you need to configure your environment with the necessary AWS credentials and API keys. Follow these steps:
     
@@ -92,7 +92,7 @@ When running commands from the command line, replace `/path/to/your/virtualenv/b
 
 Ensure that your virtual environment is activated in Visual Studio Code to use the correct Python interpreter. You can select the interpreter by opening the Command Palette (Ctrl+Shift+P or Cmd+Shift+P) and typing `Python: Select Interpreter`, then choosing the appropriate environment.
 
-7. # Testing
+## Testing
 
 - To test the SpeechSync section of our app, you can use the videos provided in the test_folder. These videos are specifically designed for testing and contain footage of the three machines we've trained our object detection model on. Each video also includes voice prompts related to safety, which the app will process during the test.
 
