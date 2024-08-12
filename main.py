@@ -38,17 +38,6 @@ def text_to_speech(text):
         tts.save(fp.name)
         return fp.name
 
-# Save uploaded image to a specified directory
-def save_uploaded_image(image):
-    if image is not None:
-        upload_dir = "uploaded_images"
-        os.makedirs(upload_dir, exist_ok=True)
-        filename = os.path.join(upload_dir, f"uploaded_image_{os.path.basename(image)}")
-        shutil.copy(image, filename)
-        print("file name = ", filename)
-        return filename
-    return None
-
 # Play the latest response from the chat history
 def play_latest_response(chat_history):
     if chat_history and chat_history[-1][0] == "Bot":
@@ -86,13 +75,12 @@ def format_chat_history(chat_history):
 # Handle user input, save image if uploaded, and generate response using chatbot
 def handle_input_modified(input_text, chat_history, image):
     chat_history.append(("User", input_text))
-    image_path = save_uploaded_image(image) 
-    if image_path:
+    if image:
         # For AWS chatbot claude model
-        # response = ac.chatbot(input_text, image=image_path)
+        # response = ac.chatbot(input_text, image=image)
         # For usage with RAG
-        # response = dl.chatbot(input_text,image=image_path)
-        response = gc.chatbot(input_text, image=image_path)
+        # response = dl.chatbot(input_text,image=image)
+        response = gc.chatbot(input_text, image=image)
     else:
         # response = ac.chatbot(input_text)
         response = gc.chatbot(input_text)
@@ -169,7 +157,7 @@ with gr.Blocks(css="styles.css") as demo:
                 with gr.Column(scale=1):
                     chatbot = gr.Chatbot(layout="bubble", bubble_full_width=False, height=600)
                 with gr.Column(scale=1):
-                    text_input = gr.Textbox(label="Type your message here:", lines=3)
+                    text_input = gr.Textbox(label="Type your message here:", lines=3, elem_classes='chat_textbox')
                     with gr.Row():
                         audio_input = gr.Audio(type="filepath", label="Record Audio")
                         image_input = gr.Image(type="filepath", label="Upload Image")

@@ -7,3 +7,9 @@ body {
     font-family: sans-serif;
     line-height: 40px;
 }
+
+.chat_textbox textarea{
+    font-size : 18px;
+    font-family: sans-serif; 
+    line-height: 40px;
+}
