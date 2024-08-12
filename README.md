@@ -92,3 +92,8 @@ When running commands from the command line, replace `/path/to/your/virtualenv/b
 
 Ensure that your virtual environment is activated in Visual Studio Code to use the correct Python interpreter. You can select the interpreter by opening the Command Palette (Ctrl+Shift+P or Cmd+Shift+P) and typing `Python: Select Interpreter`, then choosing the appropriate environment.
 
+7. # Testing
+
+- To test the SpeechSync section of our app, you can use the videos provided in the test_folder. These videos are specifically designed for testing and contain footage of the three machines we've trained our object detection model on. Each video also includes voice prompts related to safety, which the app will process during the test.
+
+- For the other sections of the app, feel free to ask any safety-related questions pertaining to your workplace. You can also upload any PDF files for accident analysis, and the app will provide insights based on the content of those documents.
