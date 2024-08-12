@@ -17,13 +17,14 @@ accident_analysis_dir = os.path.join(current_dir, 'accident_analysis')
 yolo_dir = os.path.join(current_dir,'detect_machine_using_yolo')
 sys.path.append(accident_analysis_dir)
 sys.path.append(yolo_dir)
+
 # Load environment variables
 load_dotenv(find_dotenv())
 
 # Import local modules
 import data_load_gemini as dl
-##For aws service
-#import data_load_aws as dl
+# For AWS service
+# import data_load_aws as dl
 import main_yolo as yolo
 
 # Transcribe audio file to text
@@ -58,7 +59,10 @@ def play_latest_response(chat_history):
 
 # Process audio input and update chat history
 def process_audio(audio_file, chat_history):
-    text = transcribe_audio(audio_file)
+    if audio_file:
+        text = transcribe_audio(audio_file)
+    else:
+        text = ""
     return text, chat_history
 
 # Process video, generate transcription, and perform analysis
@@ -84,13 +88,13 @@ def handle_input_modified(input_text, chat_history, image):
     chat_history.append(("User", input_text))
     image_path = save_uploaded_image(image) 
     if image_path:
-        #For AWS chatbot claude model
-        #response = ac.chatbot(input_text, image=image_path)
-        #For usage with RAG
-        #response = dl.chatbot(input_text,image=image_path)
+        # For AWS chatbot claude model
+        # response = ac.chatbot(input_text, image=image_path)
+        # For usage with RAG
+        # response = dl.chatbot(input_text,image=image_path)
         response = gc.chatbot(input_text, image=image_path)
     else:
-        #response = ac.chatbot(input_text)
+        # response = ac.chatbot(input_text)
         response = gc.chatbot(input_text)
     chat_history.append(("Bot", response))
     return format_chat_history(chat_history), chat_history, ""  # Only clear text input
@@ -150,7 +154,7 @@ with gr.Blocks(css="styles.css") as demo:
             
             generate_button = gr.Button("Generate Text")
             
-            transcribe_output = gr.Textbox(label="Your Prompt", lines=3,elem_classes='textbox')
+            transcribe_output = gr.Textbox(label="Your Prompt", lines=3, elem_classes='textbox')
             text_output = gr.Textbox(label="AI Generated Text", lines=10, elem_classes='textbox')
             
             generate_button.click(
@@ -163,7 +167,7 @@ with gr.Blocks(css="styles.css") as demo:
             gr.Markdown("### Safety Bot")
             with gr.Row():
                 with gr.Column(scale=1):
-                    chatbot = gr.Chatbot(layout="bubble", bubble_full_width=False, height=600, )
+                    chatbot = gr.Chatbot(layout="bubble", bubble_full_width=False, height=600)
                 with gr.Column(scale=1):
                     text_input = gr.Textbox(label="Type your message here:", lines=3)
                     with gr.Row():
@@ -176,7 +180,7 @@ with gr.Blocks(css="styles.css") as demo:
                 audio_output = gr.Audio()
             
             state = gr.State([])
-            
+
             submit_button.click(
                 handle_input_modified,
                 inputs=[text_input, state, image_input],
@@ -205,7 +209,7 @@ with gr.Blocks(css="styles.css") as demo:
                     text_input = gr.Textbox(label="Enter your accident case", lines=5, elem_classes="textbox")
             
             analyze_button = gr.Button("Analyze")
-            output = gr.Textbox(label="Analysis Result", lines=10 ,elem_classes="textbox")
+            output = gr.Textbox(label="Analysis Result", lines=10, elem_classes="textbox")
             
             # Toggle visibility based on input type selection
             def toggle_input_type(choice):
